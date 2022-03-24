@@ -1,0 +1,32 @@
+print('Initialization process started, grabbing 50 random insults. (This may take a minute & lag you.)')
+local sayings = {}
+
+for i=1,50 do
+    local saying = http.Get('https://evilinsult.com/generate_insult.php?lang=en&type=text')
+    if not sayings[saying] then
+        table.insert(sayings, saying)
+    end
+end
+print('Finished initialization.')
+
+local function randomSaying(table)
+    return table[math.random(1, #table)]
+end
+
+local function KillSay(event)
+    if (event:GetName() == 'player_death') then
+        local LocalPlayer = client.GetLocalPlayerIndex()
+        local UID = event:GetInt('userid')
+        local Int_Attacker = event:GetInt('attacker')
+        local N_Victim = client.GetPlayerNameByUserID(UID)
+        local I_Victim = client.GetPlayerIndexByUserID(UID)
+        local I_Attacker = client.GetPlayerIndexByUserID(Int_Attacker)
+        if (I_Attacker == LocalPlayer and I_Victim ~= LocalPlayer ) then
+            client.ChatSay(N_Victim  .. ", "..randomSaying(sayings))
+        end
+    end
+end
+
+client.AllowListener('player_death')
+
+callbacks.Register('FireGameEvent', 'AWKS', KillSay)
